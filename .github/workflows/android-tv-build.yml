@@ -34,11 +34,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'android-tv/package-lock.json'
 
-      - name: Setup Java (JDK 21)
+      - name: Setup Java (JDK 17)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -54,38 +54,7 @@ jobs:
         working-directory: android-tv
         run: npx cap sync android
 
-      - name: Patch Capacitor libraries for AGP 8
-        working-directory: android-tv
-        run: |
-          echo "🔧 Patching dependencies for AGP 8 compatibility..."
-          
-          # 使用 overrides 后，@capacitor/android 实际上指向 @web-media/capacitor-geckoview
-          # 检测实际的 capacitor-android 路径
-          CAPACITOR_ANDROID_PATH=""
-          if [ -d "node_modules/@web-media/capacitor-geckoview/capacitor" ]; then
-            CAPACITOR_ANDROID_PATH="node_modules/@web-media/capacitor-geckoview/capacitor"
-          elif [ -d "node_modules/@capacitor/android/capacitor" ]; then
-            CAPACITOR_ANDROID_PATH="node_modules/@capacitor/android/capacitor"
-          fi
-          
-          if [ -n "$CAPACITOR_ANDROID_PATH" ] && [ -f "$CAPACITOR_ANDROID_PATH/build.gradle" ]; then
-            echo "  Patching Capacitor Android at: $CAPACITOR_ANDROID_PATH"
-            sed -i '/android {/a \    namespace "com.getcapacitor.android"' "$CAPACITOR_ANDROID_PATH/build.gradle"
-          else
-            echo "  ⚠️ Capacitor Android path not found, skipping..."
-          fi
-
-          # 2. Patch capacitor-cordova-android-plugins (Generated)
-          if [ -f "android/capacitor-cordova-android-plugins/build.gradle" ]; then
-             sed -i '/android {/a \    namespace "capacitor.android.plugins"' android/capacitor-cordova-android-plugins/build.gradle
-          fi
-
-          # 3. Patch @capacitor/status-bar
-          if [ -f "node_modules/@capacitor/status-bar/android/build.gradle" ]; then
-             sed -i '/android {/a \    namespace "com.capacitorjs.plugins.statusbar"' node_modules/@capacitor/status-bar/android/build.gradle
-          fi
-          
-          echo "✅ AGP 8 patching complete"
+      # AGP 7 不需要 namespace patching，跳过此步骤
 
       - name: Apply GeckoView patches
         working-directory: android-tv
