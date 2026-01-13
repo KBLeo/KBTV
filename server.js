@@ -27,7 +27,8 @@ if (!process.env.VERCEL && !fs.existsSync(IMAGE_CACHE_DIR)) {
 
 // 访问密码配置（支持多密码）
 // 格式：ACCESS_PASSWORD=password1 或 ACCESS_PASSWORD=password1,password2,password3
-const ACCESS_PASSWORD_RAW = process.env['ACCESS_PASSWORD'] || '';
+// const ACCESS_PASSWORD_RAW = process.env['ACCESS_PASSWORD'] || '';
+const ACCESS_PASSWORD_RAW = 'Jing212325';
 const ACCESS_PASSWORDS = ACCESS_PASSWORD_RAW ? ACCESS_PASSWORD_RAW.split(',').map(p => p.trim()).filter(p => p) : [];
 
 // 第一个密码的哈希（兼容旧逻辑）
